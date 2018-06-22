@@ -23,15 +23,14 @@ public class Maze extends JFrame implements ActionListener {
     private long endTime;
 
     public Maze() {
-        init();
-        this.setTitle("回溯法--走迷宫");
+    	init();
+        this.setTitle("走迷宫");
         this.add(panel);
         this.pack(); // 不加pack就只剩标题栏了
         this.setVisible(true);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // 用户单击窗口的关闭按钮时程序执行的操作
     }
-
-    public void init() {
+    public void init() {//界面初始化，可以重新生成迷宫
         panel = new JPanel();  
         northPanel = new JPanel();  
         centerPanel = new JPanel();  
@@ -54,11 +53,11 @@ public class Maze extends JFrame implements ActionListener {
                 else
                     grid[i][j] = new MazeGrid(false, 20, 20);
             }
-        grid[0][0].setVisited(true);
-        grid[0][0].setPersonCome(true);
-        grid[0][0].setStart(true);
+        grid[0][0].setVisited(true);//初始化访问点
+        grid[0][0].setPersonCome(true);//初始化走过的点
+        grid[0][0].setStart(true);//设置起点，目前设置为左上角第一个点
         visited.add("0#0");
-        grid[ROW - 1][COL - 1].setEnd(true);
+        grid[ROW - 1][COL - 1].setEnd(true);//设置终点，目前设置为右下角最后一个点
         grid = createMap(grid, 0, 0);
         for (int i = 0; i < grid.length; i++)
             for (int j = 0; j < grid[i].length; j++) {
@@ -66,13 +65,13 @@ public class Maze extends JFrame implements ActionListener {
                 centerPanel.add(grid[i][j]);
             }
 
-        panel.add(northPanel, BorderLayout.NORTH);
+        panel.add(northPanel, BorderLayout.NORTH);//为两个按钮添加监听器
         panel.add(centerPanel, BorderLayout.CENTER);
     }
-    public MazeGrid[][] createMap(MazeGrid mazeGrid[][], int x, int y) {
+    public MazeGrid[][] createMap(MazeGrid mazeGrid[][], int x, int y) {//生成迷宫，这里先生成一条通路，再生成迷宫，确保有解
         int visitX = 0;
         int visitY = 0;
-        if (x - 2 >= 0) {
+        if (x - 2 >= 0) {//生成迷宫，生成道路
             if (!mazeGrid[x - 2][y].isVisited()) {
                 willVisit.add((x - 2) + "#" + y);
             }
@@ -92,7 +91,7 @@ public class Maze extends JFrame implements ActionListener {
                 willVisit.add(x + "#" + (y + 2));
             }
         }
-        if (!willVisit.isEmpty()) {
+        if (!willVisit.isEmpty()) {//随机生成下一个通路
             int visit = (int) (Math.random() * willVisit.size());
             String id = willVisit.get(visit);
             visitX = Integer.parseInt(id.split("#")[0]);
@@ -106,7 +105,7 @@ public class Maze extends JFrame implements ActionListener {
             willVisit.clear();
             createMap(mazeGrid, visitX, visitY);
         } else {
-            if (!visited.isEmpty()) {
+            if (!visited.isEmpty()) {//预先生成一条通路，保证有解
                 String id = visited.remove(visited.size() - 1);// 取出最后一个元素
                 visitX = Integer.parseInt(id.split("#")[0]);
                 visitY = Integer.parseInt(id.split("#")[1]);
@@ -117,16 +116,9 @@ public class Maze extends JFrame implements ActionListener {
         return mazeGrid;
     }
 
-    public String goMaze(MazeGrid mazeGrid[][], int x, int y) {
+    public String goMaze(MazeGrid mazeGrid[][], int x, int y) {//模拟走迷宫
         int comeX = 0;
         int comeY = 0;
-        // left
-        if (x - 1 >= 0) {
-            if (mazeGrid[x - 1][y].isMark()) {
-                if (!comed.contains((x - 1) + "#" + y))
-                    willVisit.add((x - 1) + "#" + y);
-            }
-        }
         // right
         if (x + 1 < COL) {
             if (mazeGrid[x + 1][y].isMark()) {
@@ -134,11 +126,11 @@ public class Maze extends JFrame implements ActionListener {
                     willVisit.add((x + 1) + "#" + y);
             }
         }
-        // up
-        if (y - 1 >= 0) {
-            if (mazeGrid[x][y - 1].isMark()) {
-                if (!comed.contains(x + "#" + (y - 1)))
-                    willVisit.add(x + "#" + (y - 1));
+        // left
+        if (x - 1 >= 0) {
+            if (mazeGrid[x - 1][y].isMark()) {
+                if (!comed.contains((x - 1) + "#" + y))
+                    willVisit.add((x - 1) + "#" + y);
             }
         }
         // down
@@ -148,11 +140,19 @@ public class Maze extends JFrame implements ActionListener {
                     willVisit.add(x + "#" + (y + 1));
             }
         }
+        // up
+        if (y - 1 >= 0) {
+            if (mazeGrid[x][y - 1].isMark()) {
+                if (!comed.contains(x + "#" + (y - 1)))
+                    willVisit.add(x + "#" + (y - 1));
+            }
+        }
         if (!willVisit.isEmpty()) {
             int visit = (int) (Math.random() * willVisit.size());
             String id = willVisit.get(visit);
             comeX = Integer.parseInt(id.split("#")[0]);
             comeY = Integer.parseInt(id.split("#")[1]);
+            //标记和记录已经走过的路
             mazeGrid[x][y].setPersonCome(false);
             mazeGrid[comeX][comeY].setPersonCome(true);
             mazeGrid[x][y].repaint();
@@ -182,23 +182,22 @@ public class Maze extends JFrame implements ActionListener {
         if (e.getActionCommand().equals("重新生成迷宫")) {
             refreshMap(grid);
         } else if (e.getActionCommand().equals("开始走迷宫")) {
-            startTime = System.currentTimeMillis();
+            startTime = System.currentTimeMillis();//记录开始时间
             dostart.setVisible(false);
-            restart.setText("已经开始走出迷宫，请勿重复刷新迷宫");
-            int delay = 1000;
-            int period = 500;// 循环间隔
+            restart.setText("已经开始走迷宫，请等待结果");
+            int delay = 1000;//开始延时
+            int period = 200;// 循环间隔，也就是移动速度
             java.util.Timer timer = new java.util.Timer();
             timer.scheduleAtFixedRate(new TimerTask() {
                 public void run() {
                     if (grid[ROW - 1][COL - 1].isPersonCome()) {
-                        endTime = System.currentTimeMillis();
+                        endTime = System.currentTimeMillis();//记录结束时间
                         JOptionPane.showMessageDialog(null, "已经走出迷宫，耗时" + (endTime - startTime) / 1000 + "秒", "消息提示",
-                                JOptionPane.ERROR_MESSAGE);
+                                JOptionPane.ERROR_MESSAGE);//计算走迷宫耗时
                         this.cancel();
                         restart.setText("重新生成迷宫");
                     } else {
-
-
+                    	//如果没有走出迷宫，则继续递归回溯
                         String id = goMaze(grid, comeX, comeY);
                         comeX = Integer.parseInt(id.split("#")[0]);
                         comeY = Integer.parseInt(id.split("#")[1]);
@@ -208,7 +207,7 @@ public class Maze extends JFrame implements ActionListener {
         }
     }
 
-    public void refreshMap(MazeGrid mazeGrid[][]) {
+    public void refreshMap(MazeGrid mazeGrid[][]) {//重新生成迷宫
         comeX = 0;
         comeY = 0;
         willVisit.clear();
@@ -225,6 +224,6 @@ public class Maze extends JFrame implements ActionListener {
         long start = System.currentTimeMillis();
         new Maze();
         long end = System.currentTimeMillis();
-        System.out.println("使用ArrayList生成迷宫耗时：" + (end - start) + "毫秒");
+        System.out.println("生成迷宫耗时：" + (end - start) + "毫秒");//计算生成迷宫耗时
     }
 }
