@@ -7,8 +7,8 @@ import java.util.TimerTask;
 import javax.swing.*;
 @SuppressWarnings("serial") 
 public class Maze extends JFrame implements ActionListener {
-    private int ROW = 25;// ROW 和COL目前暂定只能是奇数
-    private int COL = 25;
+    private int ROW = 23;// ROW 和COL目前暂定只能是奇数
+    private int COL = 23;
     private JPanel panel;  
     private JPanel northPanel;  
     private JPanel centerPanel;  
