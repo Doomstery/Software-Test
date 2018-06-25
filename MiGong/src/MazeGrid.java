@@ -66,3 +66,4 @@ public class MazeGrid extends Canvas {  //Canvas控件代表一个矩形区域，应用程序可
         this.isEnd = isEnd;  
     }  
 }  
+//

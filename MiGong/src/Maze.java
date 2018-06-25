@@ -227,3 +227,4 @@ public class Maze extends JFrame implements ActionListener {
         System.out.println("生成迷宫耗时：" + (end - start) + "毫秒");//计算生成迷宫耗时
     }
 }
+//
